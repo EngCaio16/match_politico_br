@@ -1,7 +1,6 @@
 {
   "name": "match_politico_br",
   "version": "1.0.0",
-  "type": "module", 
   "dependencies": {
     "@vercel/node": "^3.0.0"
   }
