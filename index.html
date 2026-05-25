@@ -15,20 +15,19 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
 
-    <!-- Header -->
     <header class="gradient-bg text-white py-6 shadow-lg">
         <div class="container mx-auto px-4 text-center">
             <h1 class="text-3xl font-bold">Match Político Brasil 🇧🇷</h1>
-            <p class="mt-2 text-blue-100">Descubra seu espectro político e afinidade com diferentes ideologias</p>
+            <p class="mt-2 text-blue-100">Descubra com qual candidato você tem mais afinidade</p>
         </div>
     </header>
 
     <main class="container mx-auto px-4 py-8 max-w-2xl">
-        
-        <!-- Loading State -->
+
+        <!-- Loading -->
         <div id="loading" class="text-center py-20">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p class="mt-4 text-gray-600 font-medium">Carregando perguntas...</p>
+            <p id="loading-text" class="mt-4 text-gray-600 font-medium">Carregando perguntas...</p>
         </div>
 
         <!-- Start Screen -->
@@ -45,42 +44,37 @@
         <div id="quiz-screen" class="hidden">
             <div class="mb-6">
                 <div class="flex justify-between items-center mb-2">
-                    <span id="progress-text" class="text-sm font-semibold text-blue-600 uppercase tracking-wider">Pergunta 1 de 26</span>
+                    <span id="progress-text" class="text-sm font-semibold text-blue-600 uppercase tracking-wider">Pergunta 1 de 30</span>
                     <span id="progress-percent" class="text-sm font-bold text-gray-400">0%</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2.5">
                     <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
                 </div>
             </div>
-
             <div class="bg-white rounded-2xl shadow-xl p-8 quiz-card">
-                <h2 id="question-text" class="text-xl font-bold text-gray-800 mb-8 leading-tight">
-                    Carregando pergunta...
-                </h2>
-                <div id="options-container" class="space-y-4">
-                    <!-- Options will be injected here -->
-                </div>
+                <h2 id="question-text" class="text-xl font-bold text-gray-800 mb-8 leading-tight">Carregando pergunta...</h2>
+                <div id="options-container" class="space-y-4"></div>
             </div>
         </div>
 
         <!-- Result Screen -->
         <div id="result-screen" class="hidden space-y-6">
+
+            <!-- Gato vencedor -->
             <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
-                <h2 class="text-sm font-semibold text-blue-600 uppercase tracking-wider mb-2">Seu Resultado</h2>
-                <div id="result-emoji" class="text-6xl mb-4">⚖️</div>
-                <h3 id="result-spectre" class="text-3xl font-bold text-gray-800 mb-2">Calculando...</h3>
-                <div class="flex justify-center items-center gap-2 text-gray-500 font-medium">
-                    <span id="result-score">Pontuação: 0</span>
-                </div>
+                <p class="text-sm font-semibold text-blue-600 uppercase tracking-wider mb-3">Seu candidato</p>
+                <div id="winner-emoji" class="text-7xl mb-3">🐱</div>
+                <h3 id="winner-name" class="text-3xl font-bold text-gray-800 mb-1">...</h3>
+                <p id="winner-percent" class="text-xl font-semibold text-blue-500 mb-3">0% de match</p>
+                <p id="winner-desc" class="text-gray-500 text-sm leading-relaxed"></p>
             </div>
 
+            <!-- Todos os matches -->
             <div class="bg-white rounded-2xl shadow-xl p-8">
                 <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
-                    <span>📊</span> Afinidade por Ideologia
+                    <span>📊</span> Match com todos os candidatos
                 </h3>
-                <div id="matches-container" class="space-y-6">
-                    <!-- Matches will be injected here -->
-                </div>
+                <div id="matches-container" class="space-y-6"></div>
                 <button onclick="location.reload()" class="w-full mt-10 border-2 border-gray-200 hover:border-blue-600 hover:text-blue-600 text-gray-500 font-bold py-4 rounded-xl transition duration-200">
                     Refazer Teste
                 </button>
@@ -94,20 +88,17 @@
     </footer>
 
     <script>
-        // CONFIGURAÇÃO: Altere para a URL do seu deploy na Vercel
         const API_BASE = "https://matchpoliticobr.vercel.app/api";
 
         let questions = [];
         let currentQuestionIndex = 0;
         let userAnswers = [];
 
-        // Iniciar
         async function init() {
             try {
                 const response = await fetch(`${API_BASE}/quiz`);
                 const data = await response.json();
                 questions = data.perguntas;
-                
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('start-screen').classList.remove('hidden');
             } catch (error) {
@@ -124,8 +115,8 @@
 
         function showQuestion() {
             const question = questions[currentQuestionIndex];
-            const progress = ((currentQuestionIndex) / questions.length) * 100;
-            
+            const progress = (currentQuestionIndex / questions.length) * 100;
+
             document.getElementById('progress-text').innerText = `Pergunta ${currentQuestionIndex + 1} de ${questions.length}`;
             document.getElementById('progress-percent').innerText = `${Math.round(progress)}%`;
             document.getElementById('progress-bar').style.width = `${progress}%`;
@@ -148,12 +139,8 @@
             });
         }
 
-        async function handleAnswer(optionIndex) {
-            userAnswers.push({
-                pergunta_index: currentQuestionIndex,
-                opcao_index: optionIndex
-            });
-
+        function handleAnswer(optionIndex) {
+            userAnswers.push({ pergunta_index: currentQuestionIndex, opcao_index: optionIndex });
             if (currentQuestionIndex < questions.length - 1) {
                 currentQuestionIndex++;
                 showQuestion();
@@ -165,7 +152,7 @@
         async function showResult() {
             document.getElementById('quiz-screen').classList.add('hidden');
             document.getElementById('loading').classList.remove('hidden');
-            document.getElementById('loading').querySelector('p').innerText = "Processando seu perfil político...";
+            document.getElementById('loading-text').innerText = "Calculando seu match...";
 
             try {
                 const response = await fetch(`${API_BASE}/resultado`, {
@@ -175,27 +162,20 @@
                 });
 
                 const result = await response.json();
-                
+
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('result-screen').classList.remove('hidden');
 
-                document.getElementById('result-spectre').innerText = result.espectro;
-                document.getElementById('result-score').innerText = `Pontuação Final: ${result.pontuacao_total.toFixed(1)}`;
-                
-                // Definir emoji baseado no espectro (simplificado)
-                const emojiMap = {
-                    "Direita": "🔵",
-                    "Esquerda": "🔴",
-                    "Centro": "🟢",
-                    "Libertário": "🗽",
-                    "Conservador": "🏛️"
-                };
-                const foundKey = Object.keys(emojiMap).find(key => result.espectro.includes(key));
-                document.getElementById('result-emoji').innerText = result.matches[0]?.emoji || "⚖️";
+                // Gato vencedor (primeiro da lista, já ordenada)
+                const winner = result.matches[0];
+                document.getElementById('winner-emoji').innerText = winner.emoji;
+                document.getElementById('winner-name').innerText = winner.name;
+                document.getElementById('winner-percent').innerText = `${winner.match_percent.toFixed(1)}% de match`;
+                document.getElementById('winner-desc').innerText = winner.descricao;
 
-                const matchesContainer = document.getElementById('matches-container');
-                matchesContainer.innerHTML = '';
-
+                // Todos os 4 matches
+                const container = document.getElementById('matches-container');
+                container.innerHTML = '';
                 result.matches.forEach(match => {
                     const div = document.createElement('div');
                     div.innerHTML = `
@@ -206,12 +186,12 @@
                             </div>
                             <span class="text-sm font-bold text-blue-600">${match.match_percent.toFixed(1)}%</span>
                         </div>
-                        <div class="w-full bg-gray-100 rounded-full h-2">
-                            <div class="bg-blue-500 h-2 rounded-full" style="width: ${match.match_percent}%"></div>
+                        <div class="w-full bg-gray-100 rounded-full h-2.5">
+                            <div class="bg-blue-500 h-2.5 rounded-full transition-all duration-700" style="width: ${match.match_percent}%"></div>
                         </div>
                         <p class="text-xs text-gray-500 mt-2 leading-relaxed">${match.descricao}</p>
                     `;
-                    matchesContainer.appendChild(div);
+                    container.appendChild(div);
                 });
 
             } catch (error) {
