@@ -607,4 +607,4 @@ const perguntas_quiz = [
 
 ];
 
-export default perguntas_quiz;
+module.exports = perguntas_quiz;
