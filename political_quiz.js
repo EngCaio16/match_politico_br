@@ -578,7 +578,7 @@ const perguntas_quiz = [
       score: -1.0 
     }
   ]
-}
+},
 
 {
   pergunta: "Pergunta 30. Qual deve ser a postura do Brasil em relação à natalidade (ter filhos)?",
