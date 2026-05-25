@@ -1,9 +1,8 @@
 {
-  "name": "political-quiz-api",
+  "name": "match_politico_br",
   "version": "1.0.0",
-  "type": "module",
-  "description": "API do Quiz Político Brasil",
-  "engines": {
-    "node": ">=18"
+  "type": "module", 
+  "dependencies": {
+    "@vercel/node": "^3.0.0"
   }
 }
