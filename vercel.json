@@ -1,3 +1,8 @@
 {
-  "version": 2
+  "version": 2,
+  "rewrites": [
+    { "source": "/api/quiz", "destination": "/api/quiz" },
+    { "source": "/api/resultado", "destination": "/api/resultado" },
+    { "source": "/api/(.*)", "destination": "/api/index" }
+  ]
 }
