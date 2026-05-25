@@ -1,12 +1,8 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    }
-  ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" }
+    { "src": "/api/quiz", "dest": "/api/quiz.js" },
+    { "src": "/api/resultado", "dest": "/api/resultado.js" },
+    { "src": "/api/(.*)", "dest": "/api/index.js" }
   ]
 }
