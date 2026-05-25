@@ -1,0 +1,9 @@
+{
+  "name": "political-quiz-api",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "API do Quiz Político Brasil",
+  "engines": {
+    "node": ">=18"
+  }
+}
