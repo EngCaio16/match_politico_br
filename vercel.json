@@ -1,5 +1,15 @@
 {
   "version": 2,
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
+      ]
+    }
+  ],
   "rewrites": [
     { "source": "/api/quiz", "destination": "/api/quiz.js" },
     { "source": "/api/resultado", "destination": "/api/resultado.js" },
