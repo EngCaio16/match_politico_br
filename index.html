@@ -27,7 +27,7 @@
         <!-- Loading -->
         <div id="loading" class="text-center py-20">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p id="loading-text" class="mt-4 text-gray-600 font-medium">Carregando perguntas...</p>
+            <p id="loading-text" class="mt-4 text-gray-600 font-medium">Carregando...</p>
         </div>
 
         <!-- Start Screen -->
@@ -52,24 +52,20 @@
                 </div>
             </div>
             <div class="bg-white rounded-2xl shadow-xl p-8 quiz-card">
-                <h2 id="question-text" class="text-xl font-bold text-gray-800 mb-8 leading-tight">Carregando pergunta...</h2>
+                <h2 id="question-text" class="text-xl font-bold text-gray-800 mb-8 leading-tight"></h2>
                 <div id="options-container" class="space-y-4"></div>
             </div>
         </div>
 
         <!-- Result Screen -->
         <div id="result-screen" class="hidden space-y-6">
-
-            <!-- Gato vencedor -->
             <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
                 <p class="text-sm font-semibold text-blue-600 uppercase tracking-wider mb-3">Seu candidato</p>
-                <div id="winner-emoji" class="text-7xl mb-3">🐱</div>
-                <h3 id="winner-name" class="text-3xl font-bold text-gray-800 mb-1">...</h3>
-                <p id="winner-percent" class="text-xl font-semibold text-blue-500 mb-3">0% de match</p>
+                <div id="winner-emoji" class="text-7xl mb-3"></div>
+                <h3 id="winner-name" class="text-3xl font-bold text-gray-800 mb-1"></h3>
+                <p id="winner-percent" class="text-xl font-semibold text-blue-500 mb-3"></p>
                 <p id="winner-desc" class="text-gray-500 text-sm leading-relaxed"></p>
             </div>
-
-            <!-- Todos os matches -->
             <div class="bg-white rounded-2xl shadow-xl p-8">
                 <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
                     <span>📊</span> Match com todos os candidatos
@@ -88,119 +84,316 @@
     </footer>
 
     <script>
-        const API_BASE = "https://matchpoliticobr.vercel.app/api";
+    // ── PERGUNTAS ────────────────────────────────────────────────────────────
+    const QUESTIONS = [
+      { pergunta: "Pergunta 1. Qual deve ser o papel das empresas estatais no Brasil?", opcoes: [
+        { texto: "A) Privatizar o máximo possível de empresas estatais.", score: 1.0 },
+        { texto: "B) Privatizar parte das estatais, mas manter empresas estratégicas como Petrobrás e Banco do Brasil.", score: 0.5 },
+        { texto: "C) Manter as estatais atuais como estão hoje.", score: -0.5 },
+        { texto: "D) O governo deveria criar e ampliar mais empresas estatais.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 2. Você é a favor da redução da maioridade penal para 16 anos?", opcoes: [
+        { texto: "A) Sim, para todos os crimes.", score: 1.0 },
+        { texto: "B) Sim, mas apenas para crimes hediondos.", score: 0 },
+        { texto: "C) Não, deve continuar como é hoje.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 3. Como o aborto deve ser tratado no Brasil?", opcoes: [
+        { texto: "A) O aborto deve ser amplamente legalizado até 12 semanas.", score: 1.0 },
+        { texto: "B) Permitido apenas nos casos previstos em lei (estupro, risco à vida).", score: 0 },
+        { texto: "C) O aborto deve ser totalmente proibido.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 4. Como deve funcionar o SUS no futuro?", opcoes: [
+        { texto: "A) Reduzir o SUS e incentivar planos de saúde privados.", score: 1.0 },
+        { texto: "B) Manter o SUS gratuito, mas com mais parceria com a rede privada.", score: 0.5 },
+        { texto: "C) Manter o SUS atual, focando em melhorar a gestão.", score: -0.5 },
+        { texto: "D) Aumentar investimentos e ampliar o atendimento público do SUS.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 5. Qual deve ser o papel das escolas cívico-militares?", opcoes: [
+        { texto: "A) Expandir o modelo em todo o país.", score: 1.0 },
+        { texto: "B) Manter apenas em regiões com mais violência.", score: 0.5 },
+        { texto: "C) Permitir como opção, mas sem prioridade do governo.", score: -0.5 },
+        { texto: "D) Encerrar o modelo e investir apenas em escolas civis.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 6. Como devem ser as leis trabalhistas no Brasil?", opcoes: [
+        { texto: "A) Mais liberdade para empresas e trabalhadores negociarem, com pouca intervenção do governo.", score: 1.0 },
+        { texto: "B) Mais flexibilidade nas contratações, mas com forte proteção social.", score: 0.5 },
+        { texto: "C) Dar mais força para acordos entre empresas e trabalhadores do que para a lei.", score: 0 },
+        { texto: "D) Manter a CLT como está, com pequenas mudanças.", score: -0.5 },
+        { texto: "E) Reforçar a CLT, ampliando direitos e proteções aos trabalhadores.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 7. Como o Brasil deve explorar minerais estratégicos, como terras-raras?", opcoes: [
+        { texto: "A) Abrir para empresas privadas e investimento estrangeiro, com pouca intervenção do governo.", score: 1.0 },
+        { texto: "B) Permitir empresas privadas, mas com forte fiscalização e participação do Estado.", score: 0 },
+        { texto: "C) Deixar principalmente nas mãos de empresas estatais e sob controle nacional.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 8. Qual deve ser o papel do ensino religioso na educação brasileira?", opcoes: [
+        { texto: "A) O governo deve financiar bolsas em escolas religiosas privadas.", score: 1.0 },
+        { texto: "B) O ensino religioso deve ter mais espaço nas escolas públicas, mas sem ser obrigatório.", score: 0.5 },
+        { texto: "C) O ensino religioso pode existir, mas deve ser pago pelas famílias e instituições privadas.", score: -0.5 },
+        { texto: "D) O governo não deve financiar nem ampliar o ensino religioso.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 9. O Brasil deve adotar prisão perpétua para crimes graves?", opcoes: [
+        { texto: "A) Sim, para crimes hediondos de extrema gravidade.", score: 1.0 },
+        { texto: "B) Não, as penas devem ter limite.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 10. Como o Brasil deve lidar com redes sociais, fake news e liberdade de expressão?", opcoes: [
+        { texto: "A) Priorizar ampla liberdade de expressão, com punição apenas para crimes concretos previstos em lei.", score: 1.0 },
+        { texto: "B) Liberdade de expressão, com fiscalização limitada para coibir conteúdos claramente ilegais.", score: 0.5 },
+        { texto: "C) Ampliar a regulação das plataformas para reduzir desinformação, com maior atuação do Estado.", score: -0.5 },
+        { texto: "D) Dar amplo poder ao Estado e ao Judiciário para remover conteúdos e combater fake news.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 11. Como deve ser o papel do Judiciário no Brasil?", opcoes: [
+        { texto: "A) O Congresso deve ter mais poder que o STF. Ministros teriam mandatos temporários.", score: 1.0 },
+        { texto: "B) O Judiciário deve interferir menos em decisões do Congresso, atuando mais na aplicação técnica da lei.", score: 0.5 },
+        { texto: "C) Manter o modelo atual, com equilíbrio entre os poderes.", score: 0 },
+        { texto: "D) O Judiciário deve ter mais força para revisar leis e proteger direitos.", score: -0.5 },
+        { texto: "E) O Judiciário deve poder intervir mais em políticas públicas quando achar necessário.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 12. Qual deve ser a política de impostos e gastos públicos no Brasil?", opcoes: [
+        { texto: "A) Reduzir fortemente impostos e gastos públicos, com menor atuação do Estado na economia.", score: 1.0 },
+        { texto: "B) Reduzir impostos aos poucos e cortar alguns gastos, mantendo serviços essenciais.", score: 0.5 },
+        { texto: "C) Manter a carga tributária atual, com melhor gestão dos recursos.", score: 0 },
+        { texto: "D) Aumentar os gastos públicos para ampliar serviços e infraestrutura.", score: -0.5 },
+        { texto: "E) Aumentar impostos sobre ricos e empresas para financiar programas sociais.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 13. Qual deve ser a política do Brasil em relação às cotas raciais?", opcoes: [
+        { texto: "A) Acabar com as cotas raciais e adotar apenas critério socioeconômico.", score: 1.0 },
+        { texto: "B) Manter as cotas atuais, mas com prazo definido para acabar.", score: 0.5 },
+        { texto: "C) Manter as cotas raciais como estão.", score: -0.5 },
+        { texto: "D) Ampliar as cotas para mais áreas e instituições.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 14. Como o Brasil deve tratar a posse e o porte de armas?", opcoes: [
+        { texto: "A) Liberar amplamente posse e porte de armas para cidadãos.", score: 1.0 },
+        { texto: "B) Flexibilizar as regras de posse, mas manter restrições ao porte.", score: 0.5 },
+        { texto: "C) Manter as regras atuais de posse e porte.", score: -0.5 },
+        { texto: "D) Restringir mais a posse e proibir o porte civil.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 15. Qual deve ser a política do Brasil em relação ao casamento homoafetivo?", opcoes: [
+        { texto: "A) Manter o casamento homoafetivo como está, com os mesmos direitos.", score: 1.0 },
+        { texto: "B) Reconhecer união estável, mas não o casamento civil.", score: 0 },
+        { texto: "C) Não reconhecer juridicamente uniões homoafetivas.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 16. Como o Brasil deve lidar com a reforma agrária?", opcoes: [
+        { texto: "A) Acabar com a reforma agrária e garantir segurança jurídica total à propriedade privada.", score: 1.0 },
+        { texto: "B) Manter a reforma agrária apenas em casos de terras improdutivas, com indenização justa.", score: 0.5 },
+        { texto: "C) Ampliar a reforma agrária, priorizando assentamentos e cooperativas.", score: -0.5 },
+        { texto: "D) Ampliar fortemente a reforma agrária e coletivização da terra.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 17. Qual deve ser a política do Brasil em relação às drogas?", opcoes: [
+        { texto: "A) Descriminalizar todas as drogas para uso pessoal.", score: 1.0 },
+        { texto: "B) Descriminalizar apenas maconha, mantendo repressão às demais.", score: 0.5 },
+        { texto: "C) Manter a política atual, sem descriminalizar nada.", score: -0.5 },
+        { texto: "D) Endurecer as penas para usuários e traficantes.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 18. Como o Brasil deve tratar os povos indígenas e suas terras?", opcoes: [
+        { texto: "A) Limitar a demarcação de novas terras e integrar indígenas ao mercado de trabalho.", score: 1.0 },
+        { texto: "B) Respeitar as terras já demarcadas, mas revisar processos em andamento.", score: 0.5 },
+        { texto: "C) Manter a política atual de demarcação, com pequenas correções.", score: -0.5 },
+        { texto: "D) Ampliar demarcações e fortalecer a autonomia e cultura indígena.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 19. Qual deve ser o tamanho do funcionalismo público no Brasil?", opcoes: [
+        { texto: "A) Reduzir fortemente o funcionalismo, com demissões e privatizações.", score: 1.0 },
+        { texto: "B) Reduzir gradualmente, com menos contratações e reformas na estabilidade.", score: 0.5 },
+        { texto: "C) Manter o tamanho atual, com maior eficiência e controle de gastos.", score: 0 },
+        { texto: "D) Reforçar concursos e estabilidade como base do serviço público.", score: -0.5 },
+        { texto: "E) Expandir o funcionalismo para aumentar a atuação direta do Estado.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 20. Como o Brasil deve equilibrar meio ambiente e agronegócio?", opcoes: [
+        { texto: "A) Priorizar o agronegócio, com regras ambientais mais flexíveis.", score: 1.0 },
+        { texto: "B) Buscar equilíbrio entre produção agrícola e proteção ambiental, com regras mais flexíveis.", score: 0.5 },
+        { texto: "C) Manter as regras ambientais atuais, equilibrando preservação e produção.", score: 0 },
+        { texto: "D) Priorizar fortemente a preservação ambiental, com regras mais rígidas.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 21. Qual deve ser a orientação da política externa do Brasil?", opcoes: [
+        { texto: "A) Alinhamento mais próximo com países da OCDE (EUA, Europa, Japão).", score: 1.0 },
+        { texto: "B) Pragmatismo com aproximação de países desenvolvidos, mantendo autonomia.", score: 0.5 },
+        { texto: "C) Diplomacia equilibrada entre países desenvolvidos e em desenvolvimento.", score: 0 },
+        { texto: "D) Priorizar relações com países em desenvolvimento e blocos como o BRICS.", score: -0.5 },
+        { texto: "E) Foco principalmente no mercado interno, reduzindo acordos internacionais.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 22. Qual deve ser a política do Brasil em relação à maconha?", opcoes: [
+        { texto: "A) Legalização ampla com mercado liberal, regulado de forma leve.", score: 1.0 },
+        { texto: "B) Legalização com forte controle estatal e regras rígidas.", score: 0.5 },
+        { texto: "C) Descriminalização do uso recreativo e liberação do uso medicinal.", score: 0 },
+        { texto: "D) Aumentar a repressão ao tráfico e uso recreativo.", score: -0.5 },
+        { texto: "E) Proibição total e política de repressão.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 23. Qual deve ser a política do Brasil em relação ao Bitcoin e criptomoedas?", opcoes: [
+        { texto: "A) Livre mercado com mínima regulação, aceitando uso amplo e possível reserva estratégica em Bitcoin.", score: 1.0 },
+        { texto: "B) Regulação intermediária, com regras claras para exchanges e tributação.", score: 0 },
+        { texto: "C) Forte controle estatal, com restrições ao uso e negociação.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 24. Qual deve ser o modelo de atuação do Banco Central?", opcoes: [
+        { texto: "A) Manter a independência do Banco Central, com foco em controle da inflação.", score: 1.0 },
+        { texto: "B) Retornar a maior influência do governo, priorizando crescimento e emprego.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 25. Qual deve ser o modelo de votação nas eleições brasileiras?", opcoes: [
+        { texto: "A) Voto eletrônico, sem impressão, com auditoria digital.", score: 1.0 },
+        { texto: "B) Voto eletrônico com comprovante impresso para conferência.", score: 0 },
+        { texto: "C) Voto em papel ou contagem manual.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 26. Qual deve ser o modelo da previdência social no Brasil?", opcoes: [
+        { texto: "A) Capitalização individual, com o Estado garantindo apenas renda mínima na velhice.", score: 1.0 },
+        { texto: "B) Capitalização administrada pelo governo com contas individuais.", score: 0.5 },
+        { texto: "C) Manter o sistema atual do INSS, com ajustes.", score: -0.5 },
+        { texto: "D) Ampliar a previdência pública, aumentando benefícios e participação do Estado.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 27. Qual deve ser a política do Brasil em relação às facções criminosas?", opcoes: [
+        { texto: "A) Tratar facções como organizações terroristas, aplicando leis de segurança nacional.", score: 1.0 },
+        { texto: "B) Combate rígido com legislação específica, sem enquadrá-las como terrorismo.", score: 0 },
+        { texto: "C) Tratar facções como organizações criminosas comuns, aplicando leis penais padrão.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 28. Qual deve ser a política sobre exploração de petróleo na Amazônia e litoral?", opcoes: [
+        { texto: "A) Expandir fortemente a exploração de petróleo para crescimento econômico.", score: 1.0 },
+        { texto: "B) Permitir exploração com forte regulação ambiental e estudos de impacto.", score: 0 },
+        { texto: "C) Restringir fortemente a exploração em áreas sensíveis, priorizando transição energética.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 29. O que o Brasil deve fazer para melhorar oportunidades para os jovens?", opcoes: [
+        { texto: "A) Reduzir burocracia e impostos para facilitar empregos e empreendedorismo.", score: 1.0 },
+        { texto: "B) Combinar incentivos ao emprego com educação, estágio e qualificação profissional.", score: 0 },
+        { texto: "C) Ampliar programas sociais, bolsas e apoio estatal.", score: -1.0 }
+      ]},
+      { pergunta: "Pergunta 30. Qual deve ser a postura do Brasil em relação à natalidade?", opcoes: [
+        { texto: "A) O Estado deve incentivar fortemente a natalidade, com subsídios e benefícios.", score: 1.0 },
+        { texto: "B) O Estado deve incentivar moderadamente, com apoio às famílias.", score: 0.5 },
+        { texto: "C) O Estado deve ser neutro, focando apenas em planejamento familiar.", score: -0.5 },
+        { texto: "D) O Estado deve evitar incentivar a natalidade e priorizar sustentabilidade.", score: -1.0 }
+      ]}
+    ];
 
-        let questions = [];
-        let currentQuestionIndex = 0;
-        let userAnswers = [];
+    // ── ARCHETYPES ───────────────────────────────────────────────────────────
+    const N = QUESTIONS.length;
 
-        async function init() {
-            try {
-                const response = await fetch(`${API_BASE}/quiz`);
-                const data = await response.json();
-                questions = data.perguntas;
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('start-screen').classList.remove('hidden');
-            } catch (error) {
-                console.error("Erro ao carregar perguntas:", error);
-                alert("Erro ao conectar com a API. Verifique se o deploy na Vercel está ativo.");
-            }
-        }
+    function norm(v) {
+      while (v.length < N) v.push(0);
+      return v.slice(0, N);
+    }
 
-        function startQuiz() {
-            document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('quiz-screen').classList.remove('hidden');
-            showQuestion();
-        }
+    const ARCHETYPES = [
+      {
+        name: "Gato Patriota", emoji: "🏛️",
+        descricao: "Defende valores tradicionais, livre mercado, segurança rígida e costumes conservadores.",
+        vector: norm([ 1, 1,-1, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ])
+      },
+      {
+        name: "Gato Liber", emoji: "🗽",
+        descricao: "Máxima liberdade individual e econômica. Estado mínimo.",
+        vector: norm([ 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ])
+      },
+      {
+        name: "Gato Woke", emoji: "✊",
+        descricao: "Estado forte, pautas progressistas e redução das desigualdades.",
+        vector: norm([-1,-1, 1,-1,-0.5,-1,-1,-1,-1,-0.5,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-0.5,-0.5,-1,-1,-1,-1,-1,-1,-1,-1])
+      },
+      {
+        name: "Gato Trabalhista", emoji: "🌿",
+        descricao: "Nacionalismo econômico, proteção social e soberania nacional.",
+        vector: norm([-0.5,-1, 0,-1, 0,-0.5,-1,-1,-1,-0.5,-0.5,-1,-1,-1,-1,-1,-1,-1,-0.5,-1, 0, 0,-0.5,-1,-0.5,-1,-0.5,-0.5,-1,-1])
+      }
+    ];
 
-        function showQuestion() {
-            const question = questions[currentQuestionIndex];
-            const progress = (currentQuestionIndex / questions.length) * 100;
+    // ── CÁLCULO ──────────────────────────────────────────────────────────────
+    function cosineSim(a, b) {
+      const dot = a.reduce((s, v, i) => s + v * b[i], 0);
+      const magA = Math.sqrt(a.reduce((s, v) => s + v * v, 0));
+      const magB = Math.sqrt(b.reduce((s, v) => s + v * v, 0));
+      if (magA === 0 || magB === 0) return 0;
+      return dot / (magA * magB);
+    }
 
-            document.getElementById('progress-text').innerText = `Pergunta ${currentQuestionIndex + 1} de ${questions.length}`;
-            document.getElementById('progress-percent').innerText = `${Math.round(progress)}%`;
-            document.getElementById('progress-bar').style.width = `${progress}%`;
-            document.getElementById('question-text').innerText = question.pergunta;
+    function calcMatches(answers) {
+      const uv = new Array(N).fill(0);
+      answers.forEach(({ qi, oi }) => { uv[qi] = QUESTIONS[qi].opcoes[oi].score; });
+      return ARCHETYPES.map(arch => {
+        const sim = cosineSim(uv, arch.vector);
+        return { ...arch, match_percent: parseFloat((((sim + 1) / 2) * 100).toFixed(1)) };
+      }).sort((a, b) => b.match_percent - a.match_percent);
+    }
 
-            const container = document.getElementById('options-container');
-            container.innerHTML = '';
+    // ── ESTADO ───────────────────────────────────────────────────────────────
+    let currentQ = 0;
+    let answers = [];
 
-            question.opcoes.forEach((option, index) => {
-                const btn = document.createElement('button');
-                btn.className = "option-btn w-full text-left p-4 rounded-xl border-2 border-gray-100 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 flex items-start gap-3 group";
-                btn.innerHTML = `
-                    <span class="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 group-hover:bg-blue-100 text-gray-500 group-hover:text-blue-600 flex items-center justify-center font-bold text-sm">
-                        ${String.fromCharCode(65 + index)}
-                    </span>
-                    <span class="text-gray-700 group-hover:text-blue-800 font-medium">${option.texto}</span>
-                `;
-                btn.onclick = () => handleAnswer(index);
-                container.appendChild(btn);
-            });
-        }
+    // ── INIT ─────────────────────────────────────────────────────────────────
+    function init() {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('start-screen').classList.remove('hidden');
+    }
 
-        function handleAnswer(optionIndex) {
-            userAnswers.push({ pergunta_index: currentQuestionIndex, opcao_index: optionIndex });
-            if (currentQuestionIndex < questions.length - 1) {
-                currentQuestionIndex++;
-                showQuestion();
-            } else {
-                showResult();
-            }
-        }
+    function startQuiz() {
+      document.getElementById('start-screen').classList.add('hidden');
+      document.getElementById('quiz-screen').classList.remove('hidden');
+      showQuestion();
+    }
 
-        async function showResult() {
-            document.getElementById('quiz-screen').classList.add('hidden');
-            document.getElementById('loading').classList.remove('hidden');
-            document.getElementById('loading-text').innerText = "Calculando seu match...";
+    function showQuestion() {
+      const q = QUESTIONS[currentQ];
+      const pct = Math.round((currentQ / QUESTIONS.length) * 100);
+      document.getElementById('progress-text').innerText = `Pergunta ${currentQ + 1} de ${QUESTIONS.length}`;
+      document.getElementById('progress-percent').innerText = `${pct}%`;
+      document.getElementById('progress-bar').style.width = `${pct}%`;
+      document.getElementById('question-text').innerText = q.pergunta;
 
-            try {
-                const response = await fetch(`${API_BASE}/resultado`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ respostas: userAnswers })
-                });
+      const container = document.getElementById('options-container');
+      container.innerHTML = '';
+      q.opcoes.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = "option-btn w-full text-left p-4 rounded-xl border-2 border-gray-100 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 flex items-start gap-3 group";
+        btn.innerHTML = `
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 group-hover:bg-blue-100 text-gray-500 group-hover:text-blue-600 flex items-center justify-center font-bold text-sm">${String.fromCharCode(65 + i)}</span>
+          <span class="text-gray-700 group-hover:text-blue-800 font-medium">${opt.texto}</span>
+        `;
+        btn.onclick = () => handleAnswer(i);
+        container.appendChild(btn);
+      });
+    }
 
-                const result = await response.json();
+    function handleAnswer(oi) {
+      answers.push({ qi: currentQ, oi });
+      if (currentQ < QUESTIONS.length - 1) {
+        currentQ++;
+        showQuestion();
+      } else {
+        showResult();
+      }
+    }
 
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('result-screen').classList.remove('hidden');
+    function showResult() {
+      document.getElementById('quiz-screen').classList.add('hidden');
 
-                // Gato vencedor (primeiro da lista, já ordenada)
-                const winner = result.matches[0];
-                document.getElementById('winner-emoji').innerText = winner.emoji;
-                document.getElementById('winner-name').innerText = winner.name;
-                document.getElementById('winner-percent').innerText = `${winner.match_percent.toFixed(1)}% de match`;
-                document.getElementById('winner-desc').innerText = winner.descricao;
+      const matches = calcMatches(answers);
+      const winner = matches[0];
 
-                // Todos os 4 matches
-                const container = document.getElementById('matches-container');
-                container.innerHTML = '';
-                result.matches.forEach(match => {
-                    const div = document.createElement('div');
-                    div.innerHTML = `
-                        <div class="flex justify-between items-center mb-2">
-                            <div class="flex items-center gap-2">
-                                <span class="text-2xl">${match.emoji}</span>
-                                <span class="font-bold text-gray-800">${match.name}</span>
-                            </div>
-                            <span class="text-sm font-bold text-blue-600">${match.match_percent.toFixed(1)}%</span>
-                        </div>
-                        <div class="w-full bg-gray-100 rounded-full h-2.5">
-                            <div class="bg-blue-500 h-2.5 rounded-full transition-all duration-700" style="width: ${match.match_percent}%"></div>
-                        </div>
-                        <p class="text-xs text-gray-500 mt-2 leading-relaxed">${match.descricao}</p>
-                    `;
-                    container.appendChild(div);
-                });
+      document.getElementById('winner-emoji').innerText = winner.emoji;
+      document.getElementById('winner-name').innerText = winner.name;
+      document.getElementById('winner-percent').innerText = `${winner.match_percent}% de match`;
+      document.getElementById('winner-desc').innerText = winner.descricao;
 
-            } catch (error) {
-                console.error("Erro ao processar resultado:", error);
-                alert("Erro ao calcular resultado. Verifique sua conexão.");
-            }
-        }
+      const container = document.getElementById('matches-container');
+      container.innerHTML = '';
+      matches.forEach(m => {
+        const div = document.createElement('div');
+        div.innerHTML = `
+          <div class="flex justify-between items-center mb-2">
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">${m.emoji}</span>
+              <span class="font-bold text-gray-800">${m.name}</span>
+            </div>
+            <span class="text-sm font-bold text-blue-600">${m.match_percent}%</span>
+          </div>
+          <div class="w-full bg-gray-100 rounded-full h-2.5">
+            <div class="bg-blue-500 h-2.5 rounded-full transition-all duration-700" style="width: ${m.match_percent}%"></div>
+          </div>
+          <p class="text-xs text-gray-500 mt-2 leading-relaxed">${m.descricao}</p>
+        `;
+        container.appendChild(div);
+      });
 
-        init();
+      document.getElementById('result-screen').classList.remove('hidden');
+    }
+
+    init();
     </script>
 </body>
 </html>
+
