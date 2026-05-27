@@ -1,2 +1,0 @@
-# Sem dependências externas — usa apenas stdlib do Python 3.x
-# (json, urllib, math, functools, http.server)
