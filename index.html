@@ -506,10 +506,13 @@
     const container = document.getElementById('q-opcoes');
     container.innerHTML = '';
 
-    p.opcoes.forEach((op, idx) => {
+    const indices = p.opcoes.map((_, i) => i);
+    indices.sort(() => Math.random() - 0.5);
+
+    indices.forEach(idx => {
       const btn = document.createElement('button');
       btn.className = 'opcao-btn' + (respostas[atual] === idx ? ' selected' : '');
-      btn.textContent = op.texto.trim();
+      btn.textContent = p.opcoes[idx].texto.trim();
       btn.onclick = () => selecionar(idx);
       container.appendChild(btn);
     });
@@ -611,5 +614,7 @@
     atualizarProgress();
   }
 </script>
+</body>
+</html>
 </body>
 </html>
