@@ -197,23 +197,23 @@
     "pergunta": "Como deve ser o papel do Judiciário no Brasil?",
     "opcoes": [
       {
-        "texto": "O Congresso deve ter mais poder que o STF em decisões políticas. Ministros teriam mandatos temporários.",
+        "texto": "Mandatos temporários para ministros e desembargadores das cortes e menos poder político do Judiciário.",
         "score": 1.0
       },
       {
-        "texto": "O Judiciário deve interferir menos em decisões do Congresso e do governo, atuando mais na aplicação técnica da lei.",
+        "texto": "Reduzir privilégios e aumentar transparência e fiscalização.",
         "score": 0.5
       },
       {
-        "texto": "Manter o modelo atual, com equilíbrio entre os poderes e o STF fazendo controle da Constituição.",
+        "texto": "Fazer reformas administrativas para aumentar eficiência, mantendo a estrutura atual.",
         "score": 0
       },
       {
-        "texto": "O Judiciário deve ter mais força para revisar leis e proteger direitos, com STF mais atuante.",
+        "texto": "Ampliar mecanismos de proteção de direitos e fortalecer a atuação do STF",
         "score": -0.5
       },
       {
-        "texto": "O Judiciário deve poder intervir mais em políticas públicas e decisões do Congresso quando achar necessário.",
+        "texto": "Dar mais poder ao Judiciário para revisar decisões políticas e políticas públicas",
         "score": -1.0
       }
     ]
